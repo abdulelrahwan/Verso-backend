@@ -6,6 +6,8 @@ const speech = require('@google-cloud/speech');
 var multer = require('multer')
 const request = require('request');
 
+let cors = require('cors')
+
 
 
 var config = {
@@ -17,12 +19,12 @@ const app = express();
 var fs = require('fs'),
 path = require('path'),
 _ = require('underscore');
-
 const client = new speech.SpeechClient();
 
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(express.json());
+app.use(cors());
 
 
 const options = {
