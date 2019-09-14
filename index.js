@@ -1,10 +1,11 @@
 const express = require('express');
 // const session = require('express-session');
-// const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 // const passport = require('passport');
 const speech = require('@google-cloud/speech');
 var multer = require('multer')
 const request = require('request');
+
 
 
 var config = {
@@ -18,6 +19,10 @@ path = require('path'),
 _ = require('underscore');
 
 const client = new speech.SpeechClient();
+
+
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(express.json());
 
 
 const options = {
@@ -79,19 +84,22 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
         config: config,
       };
 
-      console.log(send);
+      var options = {
+        uri: 'https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
+        method: 'POST',
+        json: send
+      };
 
+      console.log(send)
+      request.post(options, function (error, response, body){
+         console.log(response)
+      })
       // const response = client.recognize(send);
       // const transcription = response.results
       //   .map(result => result.alternatives[0].transcript)
       //   .join('\n');
       // console.log(`Transcription: ${transcription}`);
-      
-
-
-    request.post('https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',{send}, function(err, httpResponse, body){
-      console.log(body);
-    })
+    
 
 
     return res.send(fileName);
@@ -100,7 +108,7 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
 
 
 app.post('/sentiment', function(req,res){
-  const text = "This is the worst hackathon in the world I hate it."
+  const text = req.body.text;
   console.log(text)
 
   const lol  = {
@@ -119,6 +127,7 @@ app.post('/sentiment', function(req,res){
   };
   request.post(options, function (error, response, body) {
     console.log(body);
+    res.send(200)
   }
   
   )
