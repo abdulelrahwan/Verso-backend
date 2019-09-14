@@ -105,15 +105,17 @@ app.post('/sentiment', function(req,res){
   const text = "This is the worst hackathon in the world I hate it."
   console.log(text)
 
-  const document  = {
+  const lol  = {
     content: text,
     type: 'PLAIN_TEXT',
   };
+  const document = {
+    document:lol
+  }
 
-
-
+  console.log(document)
   request.post('https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
-  document, function(err, httpResponse, body){
+  {document: document}, function(err, httpResponse, body){
       console.log(body);
     })
 
