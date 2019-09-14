@@ -5,6 +5,9 @@
   "repository": "git@github.com:abdulelrahwan/Wellness.git",
   "author": "walsker <walskerw@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@google-cloud/language": "^3.2.6",
     "@google-cloud/speech": "^3.2.6",
