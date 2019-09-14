@@ -64,7 +64,7 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
     const file = fs.readFileSync('./uploads/' + fileName);
     console.log("file im sending is: "+ typeof file)
     const audioBytes = file.toString('base64');
-    console.log(audioBytes)
+    //console.log(audioBytes)
 
     const audio = {
         content: audioBytes,
@@ -73,7 +73,6 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
       const config = {
         encoding: 'FLAC',
         sampleRateHertz: 16000,
-        audioChannelCount: 1,
         languageCode: 'en-US',
       };
 
@@ -81,6 +80,8 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
         audio: audio,
         config: config,
       };
+
+      console.log(send);
 
       // const response = client.recognize(send);
       // const transcription = response.results
@@ -90,10 +91,7 @@ app.post('/transcribe', upload.single('avatar'), function(req, res) {
       
 
 
-    request.post('https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',{request:{
-      audio: audio,
-      config: config,
-    }}, function(err, httpResponse, body){
+    request.post('https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',{send}, function(err, httpResponse, body){
       console.log(body);
     })
 
@@ -114,12 +112,23 @@ app.post('/sentiment', function(req,res){
   const document = {
     document:lol
   }
-
+  var options = {
+    uri: 'https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
+    method: 'POST',
+    json: {
+      "document": lol
+    }
+  };
+  request.post(options, function (error, response, body) {
+    console.log(body);
+  }
+  
+  )
   console.log(document)
-  request.post('https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
-  {document: document}, function(err, httpResponse, body){
-      console.log(body);
-    })
+  // request.post('https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
+  // lol, function(err, httpResponse, body){
+  //     console.log(body);
+  //   })
 
 
 })
