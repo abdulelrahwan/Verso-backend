@@ -150,19 +150,66 @@ function getMostRecentFileName(dir) {
 }
 
 //need to input text into function
-const getSentimentData = async function(text){
-  const document = {
-    content: text,
-    type: 'PLAIN_TEXT',
-  };
+// const getSentimentData = async function(text){
+  
+//   const document = {
+//     content: text,
+//     type: 'PLAIN_TEXT',
+//   };
 
-  const [result] = await languageClient.analyzeSentiment({document});
-  return result;
+
+//   var options = {
+//     uri: 'https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
+//     method: 'POST',
+//     json: {
+//       "document": document
+//     }
+//   };
+//   let temp;
+  
+//   await request.post(options, function (error, response, body) {
+//     console.log(body)
+//      temp = body;
+//   })
+  
+//   return temp;
+// }
+
+// const theResult = getSentimentData("I had a great week! I love my dog.")
+// .then(something => {
+//   console.log(something)
+//   const sentiment = theResult.documentSentiment;
+//   console.log(`Document sentiment:`)
+//   console.log(`  Score: ${sentiment.score}`);
+//   console.log(`  Magnitude: ${sentiment.magnitude}`);
+// }).catch(error => console.log(error))
+
+
+const text = "I had such a great time at the beach!!!";
+async function plsWork(text){
+  
+  try{
+    const document = {
+      content: text,
+      type: 'PLAIN_TEXT',
+    };
+    
+    // Detects the sentiment of the document
+    const [result] = await languageClient.analyzeSentiment({document});
+    
+    const sentiment = result.documentSentiment;
+    // console.log(`Document sentiment:`);
+    // console.log(`  Score: ${sentiment.score}`);
+    // console.log(`  Magnitude: ${sentiment.magnitude}`);
+    return sentiment;
+  }
+  catch (error){
+    console.log(error)
+  }
+  
 }
 
-const theResult = getSentimentData("I had a great week! I love my dog.").then(() => {
-  const sentiment = theResult.documentSentiment;
-  console.log(`Document sentiment:`)
-  console.log(`  Score: ${sentiment.score}`);
-  console.log(`  Magnitude: ${sentiment.magnitude}`);
-}).catch(error => console.log(error))
+const returnVal = plsWork(text);
+console.log(`Document returnVal:`);
+console.log(`  Score: ${returnVal.score}`);
+console.log(`  Magnitude: ${returnVal.magnitude}`);
