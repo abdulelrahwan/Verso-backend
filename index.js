@@ -5,6 +5,8 @@ const express = require('express');
 const speech = require('@google-cloud/speech');
 var multer = require('multer')
 const request = require('request');
+const language = require('@google-cloud/language')
+const languageClient = new language.LanguageServiceClient();
 
 
 var config = {
@@ -137,3 +139,21 @@ function getMostRecentFileName(dir) {
         return fs.statSync(fullpath).ctime;
     });
 }
+
+//need to input text into function
+const getSentimentData = async function(text){
+  const document = {
+    content: text,
+    type: 'PLAIN_TEXT',
+  };
+
+  const [result] = await languageClient.analyzeSentiment({document});
+  return result;
+}
+
+const theResult = getSentimentData("I had a great week! I love my dog.").then(() => {
+  const sentiment = theResult.documentSentiment;
+  console.log(`Document sentiment:`)
+  console.log(`  Score: ${sentiment.score}`);
+  console.log(`  Magnitude: ${sentiment.magnitude}`);
+}).catch(error => console.log(error))
