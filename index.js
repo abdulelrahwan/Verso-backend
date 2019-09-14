@@ -1,7 +1,7 @@
 const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const passport = require('passport');
+// const session = require('express-session');
+// const bodyParser = require('body-parser');
+// const passport = require('passport');
 const speech = require('@google-cloud/speech');
 var multer = require('multer')
 const request = require('request');
