@@ -3,18 +3,34 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const speech = require('@google-cloud/speech');
-const client = new speech.SpeechClient();
 var multer = require('multer')
 const language = require('@google-cloud/language')
 const languageClient = new language.LanguageServiceClient();
+const request = require('request');
 
 
+var config = {
+  projectId: 'Wellness-2d83d5b2e4ad',
+  keyFilename: './Wellness-2d83d5b2e4ad'
+};
 
 const app = express();
 var fs = require('fs'),
 path = require('path'),
 _ = require('underscore');
 
+const client = new speech.SpeechClient();
+
+
+const options = {
+    hostname: 'https://speech.googleapis.com/v1',
+    path: '/speech:recognize',
+    method: 'POST',
+    headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json'
+    }
+};
 
 
 var listener = app.listen(8888, function(){
@@ -42,30 +58,71 @@ app.get('/firmware/new', function(req, res) {
 
 
 app.post('/transcribe', upload.single('avatar'), function(req, res) {
-    const file = req.file;
+    //const file = req.file;
     
     fileName = getMostRecentFileName('./uploads/')
     const file = fs.readFileSync('./uploads/' + fileName);
+    console.log("file im sending is: "+ typeof file)
     const audioBytes = file.toString('base64');
+    console.log(audioBytes)
 
     const audio = {
         content: audioBytes,
       };
 
       const config = {
-        encoding: 'LINEAR16',
+        encoding: 'FLAC',
         sampleRateHertz: 16000,
+        audioChannelCount: 1,
         languageCode: 'en-US',
       };
 
-      const request = {
+      const send = {
         audio: audio,
         config: config,
       };
 
+      // const response = client.recognize(send);
+      // const transcription = response.results
+      //   .map(result => result.alternatives[0].transcript)
+      //   .join('\n');
+      // console.log(`Transcription: ${transcription}`);
+      
+
+
+    request.post('https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',{request:{
+      audio: audio,
+      config: config,
+    }}, function(err, httpResponse, body){
+      console.log(body);
+    })
+
 
     return res.send(fileName);
 })
+
+
+
+app.post('/sentiment', function(req,res){
+  const text = "This is the worst hackathon in the world I hate it."
+  console.log(text)
+
+  const document  = {
+    content: text,
+    type: 'PLAIN_TEXT',
+  };
+
+
+
+  request.post('https://language.googleapis.com/v1/documents:analyzeSentiment?key=AIzaSyDBJlHj0qmUZjLZjldzGSfgwqBNT2t_irY',
+  document, function(err, httpResponse, body){
+      console.log(body);
+    })
+
+
+})
+
+
 
 
 function getMostRecentFileName(dir) {
