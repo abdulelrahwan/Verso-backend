@@ -5,7 +5,8 @@ const passport = require('passport');
 const speech = require('@google-cloud/speech');
 const client = new speech.SpeechClient();
 var multer = require('multer')
-
+const language = require('@google-cloud/language')
+const languageClient = new language.LanguageServiceClient();
 
 
 
@@ -79,3 +80,20 @@ function getMostRecentFileName(dir) {
         return fs.statSync(fullpath).ctime;
     });
 }
+
+//need to input text into function
+const getSentimentData = async function(text){
+  const document = {
+    content: text,
+    type: 'PLAIN_TEXT',
+  };
+
+  const [result] = await languageClient.analyzeSentiment({document});
+  return result;
+}
+
+const result = getSentimentData("I had a great week! I love my dog.")
+const sentiment = result.documentSentiment;
+console.log(`Document sentiment:`)
+console.log(`  Score: ${sentiment.score}`);
+console.log(`  Magnitude: ${sentiment.magnitude}`);
