@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const speech = require('@google-cloud/speech');
 var multer = require('multer')
 const request = require('request');
-
+var Firebase = require('firebase')
 let cors = require('cors')
 
 
@@ -20,6 +20,14 @@ var fs = require('fs'),
 path = require('path'),
 _ = require('underscore');
 const client = new speech.SpeechClient();
+
+Firebase.initializeApp({
+  databaseURL: "https://wellness-1568474056109.firebaseio.com/",
+  serviceAccount: './wellness-1568474056109-export.json', //this is file that I downloaded from Firebase Console
+});
+
+var db = Firebase.database();
+var personRef = db.ref("person");
 
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -48,7 +56,7 @@ var storage = multer.diskStorage(
         destination: './uploads/',
         filename: function ( req, file, cb ) {
             //req.body is empty...
-            cb( null, file.originalname+ '-' + Date.now()+".mp3");
+            cb( null, Date.now() + '-' + file.originalname);
         }
     }
 );
@@ -143,7 +151,35 @@ app.post('/sentiment', function(req,res){
 })
 
 
+app.post('/addToDB', function(req,res){
+  const afraid = req.body.afraid;
+  const happy = req.body.happy;
+  const neutral = req.body.neutral;
+  const sad = req.body.sad;
+  const anger = req.body.anger;
+  const sentimentMagnitude = req.body.sentimentMagnitude;
+  const sentimentScore = req.body.sentimentScore;
+  const date = Date.now();
 
+  const data = {
+     afraid: req.body.afraid,
+     happy : req.body.happy,
+     neutral: req.body.neutral,
+     sad: req.body.sad,
+     anger: req.body.anger,
+     sentimentMagnitude: req.body.sentimentMagnitude,
+     sentimentScore: req.body.sentimentScore,
+     date: Date.now()
+  }
+  personRef.push(data, function(err){
+    if(err){
+      res.send(err);
+    } else {
+      res.json({message: "Success: User Save.", result: true, data: data});
+    }
+  })
+
+})
 
 function getMostRecentFileName(dir) {
     var files = fs.readdirSync(dir);
