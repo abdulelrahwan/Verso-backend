@@ -175,10 +175,94 @@ app.post('/addToDB', function(req,res){
     if(err){
       res.send(err);
     } else {
-      res.json({message: "Success: User Save.", result: true, data: data});
+      res.json({message: "Success: User Save.", result: true, data:data});
     }
   })
 
+})
+
+
+app.get('/sentimentScores', function(req, res){
+  var scores = []
+  personRef.once('value', (snapshot) => {
+    snapshot.forEach((child) => {
+      console.log(child.key, child.val()); 
+      scores.push(child.val().sentimentScore)
+      console.log("scores: " + scores);
+      
+    })
+    res.send({scores: scores})
+  })
+  // scoresString = JSON.stringify(scores);
+  
+})
+
+app.get('/avgFeelings',function (req, res){
+  var happyScores = [];
+  var sadScores = [];
+  var angryScores = [];
+  var neutralScores = [];
+  var afraidScores = [];
+
+  var happyAvg;
+  var sadAvg;
+  var angryAvg;
+  var neutralScores;
+  var afraidScores;
+
+  personRef.once('value', (snapshot) => {
+    snapshot.forEach((child) => {
+      happyScores.push(child.val().happy);
+      sadScores.push(child.val().sad);
+      angryScores.push(child.val().anger);
+      neutralScores.push(child.val().neutral);
+      afraidScores.push(child.val().afraid);
+
+    })
+    var sum = 0;
+    happyScores.forEach(function(element){
+      sum = sum + element
+    })
+    happyAvg = sum / happyScores.length;
+    console.log("happyavg: "+ happyAvg);
+
+    sum = 0;
+    sadScores.forEach(function(element){
+      sum = sum + element
+    })
+    sadAvg = sum / sadScores.length; 
+
+    sum = 0;
+    angryScores.forEach(function(element){
+      sum = sum + element
+    })
+    angryAvg = sum / angryScores.length; 
+    
+
+    sum = 0;
+    neutralScores.forEach(function(element){
+      sum = sum + element
+    })
+    neutralAvg = sum / neutralScores.length; 
+    
+    sum = 0;
+    afraidScores.forEach(function(element){
+      sum = sum + element
+    })
+    afraidAvg = sum / afraidScores.length; 
+    
+    var averages = {
+      happyAvg: happyAvg,
+      sadAvg: sadAvg,
+      angryAvg: angryAvg,
+      neutralAvg: neutralAvg,
+      afraidAvg: afraidAvg
+    }
+
+    res.json({message: "Success: User Save.", result: true, data: averages});
+  })
+
+    
 })
 
 function getMostRecentFileName(dir) {
