@@ -6,7 +6,7 @@
   "author": "walsker <walskerw@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "export GOOGLE_APPLICATION_CREDENTIALS='./gcp-key.json' && node index.js"
   },
   "dependencies": {
     "@google-cloud/language": "^3.2.6",
