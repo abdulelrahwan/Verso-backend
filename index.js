@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const speech = require('@google-cloud/speech');
 const cors = require('cors')
 const fs = require('fs');
 const path = require('path')
@@ -8,8 +7,8 @@ const request = require('request');
 
 const PORT = process.env.PORT || 3000;
 
+const {convertSpeech} = require('./src/speechRecognition');
 const app = express();
-const client = new speech.SpeechClient();
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -27,6 +26,8 @@ app.post('/transcribe', async (req, res, next) => {
   try {
     console.log('Transcribe request received!')
   
+    // TODO: receive the body of the req (base64 audio) and send it to convertSpeech()
+    
     // The name of the audio file to transcribe
     const fileName = './sample.wav';
   
@@ -34,27 +35,7 @@ app.post('/transcribe', async (req, res, next) => {
     const file = fs.readFileSync(fileName);
     const audioBytes = file.toString('base64');
   
-    // The audio file's encoding, sample rate in hertz, and BCP-47 language code
-    const audio = {
-      content: audioBytes,
-    };
-  
-    const config = {
-      encoding: 'LINEAR16',
-      languageCode: 'en-US',
-    };
-  
-    const request = {
-      audio: audio,
-      config: config,
-    };
-  
-    // Detects speech in the audio file
-    const [response] = await client.recognize(request);
-    const transcription = response.results
-      .map(result => result.alternatives[0].transcript)
-      .join('\n');
-    console.log(`Transcription: ${transcription}`);
+    await convertSpeech(audioBytes)
 
     next()
   } catch (error) {

@@ -1,2 +1,4 @@
 node_modules
 gcp-key.json
+
+.DS_Store
