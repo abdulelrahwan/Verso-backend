@@ -1,9 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const cors = require('cors')
 const fs = require('fs');
+const request = require('request-promise-native');
+const resolveCwd = require('resolve-cwd');
 
 const PORT = process.env.PORT || 3000;
+const upload = multer({ dest: './uploads/'});
 
 const convertSpeech = require('./src/speechRecognition');
 const analyzeSentiment = require('./src/sentimentAnalysis');
@@ -22,26 +26,36 @@ app.get('/', (req, res) => {
   return res.send('Welcome to Verso!');
 });
 
-app.post('/verso', async (req, res, next) => {
+app.post('/verso', upload.single('dialog'), async (req, res, next) => {
   try {
     console.log('Verso request received!')
-  
-    // TODO: receive the body of the req (base64 audio) and send it to convertSpeech()
+
 
     // The name of the audio file to transcribe
-    const fileName = './sample.wav';
+    const fileName = './' + req.file.path;
   
     // Reads a local audio file and converts it to base64
     const file = fs.readFileSync(fileName);
     const audioBytes = file.toString('base64');
   
-    console.log('Transcribing speech...')
+    console.log('Analyzing Tone...');
+    const emotions = await request({
+      method: 'POST',
+      uri: 'http://localhost:5000/verso',
+      json: true,
+      body: {filePath: resolveCwd(fileName)}
+    })
+
+    console.log('Tone Analyzed. Results: ', JSON.stringify(emotions));
+
+    console.log('Transcribing speech...');
     const speech = await convertSpeech(audioBytes);
 
     console.log('Speech Transcribed. Analyzing.')
-    const analysis = await analyzeSentiment(speech);
+    const positivity = await analyzeSentiment(speech);
 
-    console.log('Done.');
+    const results = {...emotions, ...positivity}
+    console.log('Done.', results);
     next()
   } catch (error) {
     console.log('Error Transcribing.')
