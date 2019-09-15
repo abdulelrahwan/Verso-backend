@@ -26,4 +26,4 @@ async function convertSpeech(base64Audio) {
   return transcription
 }
 
-module.exports = {convertSpeech};
+module.exports = convertSpeech;
